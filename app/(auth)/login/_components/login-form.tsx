@@ -16,7 +16,14 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useState } from "react";
 import apiClient from "@/lib/axios";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import Link from "next/link";
 import { toast } from "sonner";
 
@@ -42,11 +49,9 @@ export const LoginForm = () => {
       // use your API instance or fetch
       const res = await apiClient.post("/users/login", values);
       toast.success("✅ Logged in successfully!");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-      const msg =
-        err.response?.data?.error?.message ||
-        err.message ||
-        "Something went wrong!";
+      const msg = err.response?.data?.error?.message || err.message || "Something went wrong!";
       toast.error(msg);
     } finally {
       form.reset();
@@ -62,10 +67,7 @@ export const LoginForm = () => {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-6 w-full"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-full">
             <FormField
               control={form.control}
               name="email"
@@ -73,11 +75,7 @@ export const LoginForm = () => {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="test@tailortrack.com"
-                      type="email"
-                      {...field}
-                    />
+                    <Input placeholder="test@tailortrack.com" type="email" {...field} />
                   </FormControl>
                   <FormDescription>Your registered email address.</FormDescription>
                   <FormMessage />
@@ -92,11 +90,7 @@ export const LoginForm = () => {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="••••••••"
-                      {...field}
-                    />
+                    <Input type="password" placeholder="••••••••" {...field} />
                   </FormControl>
                   <FormDescription>Must be at least 8 characters.</FormDescription>
                   <FormMessage />
@@ -112,7 +106,10 @@ export const LoginForm = () => {
       </CardContent>
       <CardFooter>
         <p className="text-sm text-muted-foreground">
-          Don&apos;t have an account? <Link href="/register" className="text-primary underline">Sign up</Link>
+          Don&apos;t have an account?{" "}
+          <Link href="/register" className="text-primary underline">
+            Sign up
+          </Link>
         </p>
       </CardFooter>
     </Card>
