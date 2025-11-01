@@ -11,7 +11,7 @@ const apiClient = axios.create({
 // Example: attach token if available
 apiClient.interceptors.request.use(
   (config) => {
-    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
     if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
   },
@@ -22,7 +22,7 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error("API Error:", error.response?.data || error.message);
+    // console.error("API Error:", error.response?.data || error.message);
     return Promise.reject(error);
   }
 );
