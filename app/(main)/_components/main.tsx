@@ -1,7 +1,6 @@
 "use client";
 
 export const Main = () => {
-
   // useEffect(() => {
   //   const accessToken = localStorage.getItem('accessToken');
   //   if (!accessToken) {

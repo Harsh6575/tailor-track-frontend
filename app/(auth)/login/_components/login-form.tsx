@@ -82,7 +82,12 @@ export const LoginForm = () => {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input autoComplete="email" placeholder="test@tailortrack.com" type="email" {...field} />
+                    <Input
+                      autoComplete="email"
+                      placeholder="test@tailortrack.com"
+                      type="email"
+                      {...field}
+                    />
                   </FormControl>
                   <FormDescription>Your registered email address.</FormDescription>
                   <FormMessage />
@@ -97,7 +102,12 @@ export const LoginForm = () => {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input autoComplete="current-password" type="password" placeholder="••••••••" {...field} />
+                    <Input
+                      autoComplete="current-password"
+                      type="password"
+                      placeholder="••••••••"
+                      {...field}
+                    />
                   </FormControl>
                   <FormDescription>Must be at least 8 characters.</FormDescription>
                   <FormMessage />

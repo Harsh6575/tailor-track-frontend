@@ -17,4 +17,4 @@ export const AuthPageWrapper = ({ children }: { children: React.ReactNode }) => 
   }, [router]);
 
   return <>{children}</>;
-}
+};
