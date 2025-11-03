@@ -41,7 +41,7 @@ export const CustomerTable = () => {
     fetchCustomers();
   }, []);
 
-  // // Pagination logic
+  // Pagination logic
   const totalPages = Math.ceil(customers.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
