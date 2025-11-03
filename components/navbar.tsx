@@ -4,9 +4,16 @@ import apiClient from "@/lib/axios";
 import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useEffect, useState } from "react";
 
 export const Navbar = () => {
   const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    setIsLoggedIn(!!token);
+  }, []);
 
   const handleLogout = async () => {
     const refreshToken = localStorage.getItem("refreshToken");
@@ -27,9 +34,21 @@ export const Navbar = () => {
   };
 
   return (
-    <header className="border-b flex items-center justify-between w-full">
-      <div className="text-2xl font-bold p-4">Tailor Track</div>
-      <Button onClick={handleLogout}>Logout</Button>
+    <header className="border-b shadow-sm flex items-center justify-between w-full px-6 py-3">
+      <div
+        className="text-2xl font-bold cursor-pointer select-none"
+        onClick={() => router.push("/")}
+      >
+        Tailor<span className="text-blue-600">Track</span>
+      </div>
+
+      {isLoggedIn ? (
+        <Button variant="outline" onClick={handleLogout}>
+          Logout
+        </Button>
+      ) : (
+        <Button onClick={() => router.push("/login")}>Login</Button>
+      )}
     </header>
   );
 };

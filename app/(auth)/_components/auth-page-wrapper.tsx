@@ -7,6 +7,8 @@ export const AuthPageWrapper = ({ children }: { children: React.ReactNode }) => 
   const router = useRouter();
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
     const accessToken = localStorage.getItem("accessToken");
     const refreshToken = localStorage.getItem("refreshToken");
 

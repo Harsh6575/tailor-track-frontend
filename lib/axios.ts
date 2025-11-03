@@ -41,8 +41,16 @@ apiClient.interceptors.response.use(
     const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
 
     if (error.response?.status === 401 && !originalRequest._retry) {
+      const refreshToken = localStorage.getItem("refreshToken");
+      if (!refreshToken) {
+        // no refresh token — logout
+        localStorage.clear();
+        if (typeof window !== "undefined") window.location.href = "/login";
+        return Promise.reject(error);
+      }
+
+      // avoid multiple parallel refreshes
       if (isRefreshing) {
-        // queue requests until refresh is done
         return new Promise((resolve, reject) => {
           failedQueue.push({
             resolve: (token: string) => {
@@ -59,35 +67,33 @@ apiClient.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const refreshToken = localStorage.getItem("refreshToken");
-        if (!refreshToken) throw new Error("No refresh token found");
+        console.log("Refreshing token...");
 
         const res = await axios.post(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000"}/users/refresh-token`,
-          { refreshToken }
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000"}/users/refresh`,
+          { refreshToken },
+          { withCredentials: true }
         );
 
         const { accessToken, refreshToken: newRefreshToken } = res.data;
 
-        // save new tokens
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("refreshToken", newRefreshToken);
 
         processQueue(null, accessToken);
 
+        // update original request
         if (!originalRequest.headers) originalRequest.headers = {};
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
 
+        console.log("Token refreshed!");
+
         return apiClient(originalRequest);
       } catch (refreshError) {
+        // only clear tokens if refresh API itself fails
         processQueue(refreshError, null);
-
-        // logout user if refresh fails
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-        localStorage.removeItem("user");
+        localStorage.clear();
         if (typeof window !== "undefined") window.location.href = "/login";
-
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
