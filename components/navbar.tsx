@@ -5,6 +5,7 @@ import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
+import { ModeToggle } from "./mode-toggle";
 
 export const Navbar = () => {
   const router = useRouter();
@@ -41,14 +42,16 @@ export const Navbar = () => {
       >
         Tailor<span className="text-blue-600">Track</span>
       </div>
-
-      {isLoggedIn ? (
-        <Button variant="outline" onClick={handleLogout}>
-          Logout
-        </Button>
-      ) : (
-        <Button onClick={() => router.push("/login")}>Login</Button>
-      )}
+      <div className="flex items-center gap-4">
+        {isLoggedIn ? (
+          <Button variant="outline" onClick={handleLogout}>
+            Logout
+          </Button>
+        ) : (
+          <Button onClick={() => router.push("/login")}>Login</Button>
+        )}
+        <ModeToggle />
+      </div>
     </header>
   );
 };
