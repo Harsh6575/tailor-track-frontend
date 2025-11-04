@@ -73,9 +73,6 @@ export const AddCustomerDialog = ({ onCustomerAdded }: { onCustomerAdded?: () =>
     defaultValues: {
       fullName: "",
       phone: "",
-      // email: "",
-      // gender: "",
-      // address: "",
       measurements: [],
     },
     mode: "onBlur",
