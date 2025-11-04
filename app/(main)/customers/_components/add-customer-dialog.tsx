@@ -73,9 +73,9 @@ export const AddCustomerDialog = ({ onCustomerAdded }: { onCustomerAdded?: () =>
     defaultValues: {
       fullName: "",
       phone: "",
-      email: "",
-      gender: "",
-      address: "",
+      // email: "",
+      // gender: "",
+      // address: "",
       measurements: [],
     },
     mode: "onBlur",
@@ -162,24 +162,6 @@ export const AddCustomerDialog = ({ onCustomerAdded }: { onCustomerAdded?: () =>
                 {errors.phone && (
                   <span className="text-sm text-red-500">{errors.phone.message}</span>
                 )}
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" {...register("email")} />
-                {errors.email && (
-                  <span className="text-sm text-red-500">{errors.email.message}</span>
-                )}
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="gender">Gender</Label>
-                <Input id="gender" {...register("gender")} />
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="address">Address</Label>
-                <Input id="address" {...register("address")} />
               </div>
 
               <div className="flex justify-end pt-3">
