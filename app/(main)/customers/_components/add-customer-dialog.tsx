@@ -17,28 +17,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import apiClient from "@/lib/axios";
 import { toast } from "sonner";
 import { Loader2, Plus, Trash2 } from "lucide-react";
-
-/**
- * Default measurement templates
- */
-const defaultMeasurements = {
-  shirt: {
-    top_length: "",
-    chest: "",
-    sleeve: "",
-    shoulder: "",
-    waist: "",
-    neck: "",
-  },
-  pant: {
-    bottom_length: "",
-    hip: "",
-    ankles: "",
-    thighs: "",
-    rise: "",
-    knee: "",
-  },
-} as const;
+import { defaultMeasurements } from "@/lib/constants/measurements";
 
 /**
  * Zod schema

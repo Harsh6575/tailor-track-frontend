@@ -40,23 +40,8 @@ import {
 import { Loader2, ArrowLeft, Phone, Edit2, Trash2, Save, X, Plus } from "lucide-react";
 import { toast } from "sonner";
 import apiClient from "@/lib/axios";
-
-// Types
-type Measurements = {
-  id: string;
-  type: string;
-  notes: string;
-  data: Record<string, string>;
-};
-
-type Customer = {
-  id: string;
-  fullName: string;
-  phone: string;
-  createdAt: string;
-  updatedAt: string;
-  measurements: Measurements[];
-};
+import { Customer, Measurements } from "@/types";
+import { defaultMeasurements } from "@/lib/constants/measurements";
 
 // Validation Schemas
 const customerSchema = z.object({
@@ -106,11 +91,25 @@ export const CustomerDetails = () => {
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, replace } = useFieldArray({
     control: measurementForm.control,
     name: "data",
   });
 
+  // ✅ Auto-fill measurement fields when type changes
+  useEffect(() => {
+    const type = measurementForm.watch("type").toLowerCase();
+    if (type === "shirt" || type === "pant") {
+      const defaults = defaultMeasurements[type];
+      const formatted = Object.entries(defaults).map(([key, value]) => ({
+        key,
+        value,
+      }));
+      replace(formatted);
+    }
+  }, [measurementForm.watch("type")]);
+
+  // Fetch Customer
   const fetchCustomer = async () => {
     setLoading(true);
     try {
@@ -134,7 +133,7 @@ export const CustomerDetails = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  // Customer Update
+  // Update Customer
   const onUpdateCustomer = async (values: z.infer<typeof customerSchema>) => {
     setActionLoading(true);
     try {
@@ -150,7 +149,7 @@ export const CustomerDetails = () => {
     }
   };
 
-  // Customer Delete
+  // Delete Customer
   const onDeleteCustomer = async () => {
     setActionLoading(true);
     try {
@@ -164,7 +163,7 @@ export const CustomerDetails = () => {
     }
   };
 
-  // Measurement Add
+  // Add Measurement
   const onAddMeasurement = async (values: z.infer<typeof measurementSchema>) => {
     setActionLoading(true);
     try {
@@ -194,7 +193,7 @@ export const CustomerDetails = () => {
     }
   };
 
-  // Measurement Update
+  // Update Measurement
   const onUpdateMeasurement = async (values: z.infer<typeof measurementSchema>) => {
     if (!editMeasurementId) return;
     setActionLoading(true);
@@ -224,7 +223,7 @@ export const CustomerDetails = () => {
     }
   };
 
-  // Measurement Delete
+  // Delete Measurement
   const onDeleteMeasurement = async (measurementId: string) => {
     setActionLoading(true);
     try {
@@ -239,7 +238,7 @@ export const CustomerDetails = () => {
     }
   };
 
-  // Open Edit Measurement Dialog
+  // Open Edit Measurement
   const openEditMeasurement = (measurement: Measurements) => {
     setEditMeasurementId(measurement.id);
     const dataArray = Object.entries(measurement.data).map(([key, value]) => ({
