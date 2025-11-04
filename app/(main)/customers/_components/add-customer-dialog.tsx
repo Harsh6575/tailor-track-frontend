@@ -16,8 +16,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import apiClient from "@/lib/axios";
 import { toast } from "sonner";
-import { Loader2, Plus, Trash2 } from "lucide-react";
-import { defaultMeasurements } from "@/lib/constants/measurements";
+import { Loader2 } from "lucide-react";
+import { MeasurementBuilder } from "@/components/measurement-builder";
 
 /**
  * Zod schema
@@ -76,7 +76,6 @@ export const AddCustomerDialog = ({ onCustomerAdded }: { onCustomerAdded?: () =>
     setLoading(true);
     console.log("Form data:", data);
     try {
-      // Send full payload to your endpoint (adjust endpoint if needed)
       await apiClient.post("/customers/with-measurements", data);
       toast.success("Customer created successfully!");
       reset();
@@ -89,16 +88,6 @@ export const AddCustomerDialog = ({ onCustomerAdded }: { onCustomerAdded?: () =>
     } finally {
       setLoading(false);
     }
-  };
-
-  // helper: add a measurement card for a garment type with default data
-  const addMeasurementOfType = (type: "shirt" | "pant") => {
-    const template = defaultMeasurements[type];
-    append({
-      type,
-      notes: "",
-      data: { ...template },
-    });
   };
 
   return (
@@ -116,19 +105,21 @@ export const AddCustomerDialog = ({ onCustomerAdded }: { onCustomerAdded?: () =>
         <Button>Add Customer</Button>
       </DialogTrigger>
 
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{step === 1 ? "Add New Customer" : "Add Measurements"}</DialogTitle>
+          <DialogTitle>
+            {step === 1 ? "Add New Customer" : "Add Measurements (Optional)"}
+          </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 mt-4">
           {step === 1 && (
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div className="grid gap-2">
                 <Label htmlFor="fullName">Full Name *</Label>
                 <Input id="fullName" {...register("fullName")} />
                 {errors.fullName && (
-                  <span className="text-sm text-red-500">{errors.fullName.message}</span>
+                  <span className="text-sm text-destructive">{errors.fullName.message}</span>
                 )}
               </div>
 
@@ -136,15 +127,18 @@ export const AddCustomerDialog = ({ onCustomerAdded }: { onCustomerAdded?: () =>
                 <Label htmlFor="phone">Phone *</Label>
                 <Input id="phone" {...register("phone")} placeholder="10 digit number" />
                 {errors.phone && (
-                  <span className="text-sm text-red-500">{errors.phone.message}</span>
+                  <span className="text-sm text-destructive">{errors.phone.message}</span>
                 )}
               </div>
 
-              <div className="flex justify-end pt-3">
+              <div className="flex justify-between gap-3 pt-3">
+                <Button type="submit" variant="outline" disabled={loading}>
+                  {loading && <Loader2 className="animate-spin w-4 h-4 mr-2" />}
+                  Save Without Measurements
+                </Button>
                 <Button
                   type="button"
                   onClick={() => {
-                    // basic validation on required top-level fields before next
                     const vals = form.getValues();
                     if (!vals.fullName || vals.fullName.length < 2) {
                       toast.error("Please enter a valid name (at least 2 characters)");
@@ -157,7 +151,7 @@ export const AddCustomerDialog = ({ onCustomerAdded }: { onCustomerAdded?: () =>
                     setStep(2);
                   }}
                 >
-                  Next
+                  Next: Add Measurements
                 </Button>
               </div>
             </div>
@@ -165,105 +159,18 @@ export const AddCustomerDialog = ({ onCustomerAdded }: { onCustomerAdded?: () =>
 
           {step === 2 && (
             <div className="space-y-4">
-              {/* Buttons to add a Shirt or Pant card */}
-              <div className="flex gap-3">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => addMeasurementOfType("shirt")}
-                >
-                  <Plus className="mr-2 h-4 w-4" /> Shirt
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => addMeasurementOfType("pant")}
-                >
-                  <Plus className="mr-2 h-4 w-4" /> Pant
-                </Button>
-              </div>
+              <MeasurementBuilder
+                control={control}
+                fields={fields}
+                append={append}
+                remove={remove}
+                watch={watch}
+                setValue={setValue}
+                register={register}
+                fieldPrefix="measurements"
+              />
 
-              {/* Render each measurement card */}
-              <div className="space-y-4">
-                {fields.map((field, index) => {
-                  // watch the type so it is editable and kept in form state
-                  const typeValue = watch(`measurements.${index}.type`) as string | undefined;
-                  const dataValue = watch(`measurements.${index}.data`) as
-                    | Record<string, string>
-                    | undefined;
-
-                  // if data is undefined but type matches our template, ensure data exists
-                  if (
-                    (!dataValue || Object.keys(dataValue).length === 0) &&
-                    (typeValue === "shirt" || typeValue === "pant")
-                  ) {
-                    // populate default data for the type (only if empty)
-                    setValue(`measurements.${index}.data`, {
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      ...(defaultMeasurements as any)[typeValue],
-                    });
-                  }
-
-                  const dataKeys = dataValue ? Object.keys(dataValue) : [];
-
-                  return (
-                    <div key={field.id} className="p-3 border rounded-lg space-y-3 relative">
-                      <button
-                        type="button"
-                        className="absolute top-2 right-2 text-red-500 hover:text-red-700"
-                        onClick={() => remove(index)}
-                        aria-label={`Remove measurement ${index}`}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-
-                      <div className="grid sm:grid-cols-2 gap-3">
-                        <div className="grid gap-1">
-                          <Label>Type</Label>
-                          <Input
-                            {...register(`measurements.${index}.type`)}
-                            placeholder="e.g. shirt, pant"
-                          />
-                        </div>
-
-                        <div className="grid gap-1">
-                          <Label>Notes</Label>
-                          <Input
-                            {...register(`measurements.${index}.notes`)}
-                            placeholder="Notes (optional)"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Render measurement fields dynamically based on data keys */}
-                      <div className="grid grid-cols-2 gap-3 mt-2">
-                        {dataKeys.length > 0 ? (
-                          dataKeys.map((key) => (
-                            <div key={key} className="grid gap-1">
-                              <Label htmlFor={`measurements.${index}.data.${key}`}>
-                                {key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
-                              </Label>
-                              <Input
-                                id={`measurements.${index}.data.${key}`}
-                                {...register(`measurements.${index}.data.${key}`)}
-                                placeholder="Enter value"
-                              />
-                            </div>
-                          ))
-                        ) : (
-                          <div className="col-span-2 text-sm text-muted-foreground">
-                            No predefined measurement fields — you can edit the type to
-                            &#34;shirt&#34; or &#34;pant&#34; to auto-populate fields, or add keys
-                            programmatically.
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div className="flex justify-between pt-4">
+              <div className="flex justify-between pt-4 border-t">
                 <Button type="button" variant="outline" onClick={() => setStep(1)}>
                   Back
                 </Button>
