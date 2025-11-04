@@ -5,17 +5,17 @@ export const defaultMeasurements = {
     sleeve: "",
     shoulder: "",
     waist: "",
-    neck: "",
     front: "",
+    neck: "",
   },
   pant: {
     length: "",
+    waist: "",
     hip: "",
     ankles: "",
     thighs: "",
     rise: "",
     knee: "",
-    waist: "",
   },
 } as const;
 
