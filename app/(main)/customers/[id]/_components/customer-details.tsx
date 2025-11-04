@@ -42,6 +42,7 @@ import { toast } from "sonner";
 import apiClient from "@/lib/axios";
 import { Customer, Measurements } from "@/types";
 import { defaultMeasurements } from "@/lib/constants/measurements";
+import { AddMeasurementDialog } from "./add-measurement";
 
 // Validation Schemas
 const customerSchema = z.object({
@@ -69,7 +70,6 @@ export const CustomerDetails = () => {
   const [error, setError] = useState<string | null>(null);
   const [isEditingCustomer, setIsEditingCustomer] = useState(false);
   const [editMeasurementId, setEditMeasurementId] = useState<string | null>(null);
-  const [isAddingMeasurement, setIsAddingMeasurement] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
 
   // Customer Form
@@ -159,36 +159,6 @@ export const CustomerDetails = () => {
     } catch (err) {
       console.error(err);
       toast.error("Failed to delete customer");
-      setActionLoading(false);
-    }
-  };
-
-  // Add Measurement
-  const onAddMeasurement = async (values: z.infer<typeof measurementSchema>) => {
-    setActionLoading(true);
-    try {
-      const dataObj = values.data.reduce(
-        (acc, item) => {
-          acc[item.key] = item.value;
-          return acc;
-        },
-        {} as Record<string, string>
-      );
-
-      await apiClient.post("/customers/measurements", {
-        customerId: id,
-        type: values.type,
-        notes: values.notes || "",
-        data: dataObj,
-      });
-      toast.success("Measurement added successfully");
-      setIsAddingMeasurement(false);
-      measurementForm.reset();
-      fetchCustomer();
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to add measurement");
-    } finally {
       setActionLoading(false);
     }
   };
@@ -411,109 +381,7 @@ export const CustomerDetails = () => {
       <Card className="border-primary/20 shadow-lg">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-2xl font-semibold">Measurements</CardTitle>
-          <Dialog open={isAddingMeasurement} onOpenChange={setIsAddingMeasurement}>
-            <DialogTrigger asChild>
-              <Button size="sm" className="gap-2">
-                <Plus className="h-4 w-4" />
-                Add Measurement
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Add New Measurement</DialogTitle>
-                <DialogDescription>Add a new measurement for {customer.fullName}</DialogDescription>
-              </DialogHeader>
-              <Form {...measurementForm}>
-                <form
-                  onSubmit={measurementForm.handleSubmit(onAddMeasurement)}
-                  className="space-y-4"
-                >
-                  <FormField
-                    control={measurementForm.control}
-                    name="type"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Type</FormLabel>
-                        <FormControl>
-                          <Input placeholder="e.g., Shirt, Pant, Suit" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={measurementForm.control}
-                    name="notes"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Notes (Optional)</FormLabel>
-                        <FormControl>
-                          <Textarea placeholder="Additional notes..." {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <div className="space-y-2">
-                    <FormLabel>Measurements Data</FormLabel>
-                    {fields.map((field, index) => (
-                      <div key={field.id} className="flex gap-2">
-                        <FormField
-                          control={measurementForm.control}
-                          name={`data.${index}.key`}
-                          render={({ field }) => (
-                            <FormItem className="flex-1">
-                              <FormControl>
-                                <Input placeholder="Label (e.g., Chest)" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={measurementForm.control}
-                          name={`data.${index}.value`}
-                          render={({ field }) => (
-                            <FormItem className="flex-1">
-                              <FormControl>
-                                <Input placeholder="Value (e.g., 40)" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="icon"
-                          onClick={() => remove(index)}
-                          disabled={fields.length === 1}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => append({ key: "", value: "" })}
-                      className="w-full"
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Field
-                    </Button>
-                  </div>
-                  <DialogFooter>
-                    <Button type="submit" disabled={actionLoading}>
-                      {actionLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                      Add Measurement
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </Form>
-            </DialogContent>
-          </Dialog>
+          <AddMeasurementDialog customer={customer} onSave={() => fetchCustomer()} />
         </CardHeader>
         <CardContent>
           {customer.measurements?.length ? (
