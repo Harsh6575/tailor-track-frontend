@@ -274,8 +274,8 @@ export const AddCustomerDialog = ({ onCustomerAdded }: { onCustomerAdded?: () =>
                         ) : (
                           <div className="col-span-2 text-sm text-muted-foreground">
                             No predefined measurement fields — you can edit the type to
-                            `&#34;`shirt`&#34;` or `&#34;`pant`&#34;` to auto-populate fields, or
-                            add keys programmatically.
+                            &#34;shirt&#34; or &#34;pant&#34; to auto-populate fields, or add keys
+                            programmatically.
                           </div>
                         )}
                       </div>

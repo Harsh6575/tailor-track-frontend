@@ -700,7 +700,7 @@ export const CustomerDetails = () => {
           ) : (
             <div className="text-center py-12 text-muted-foreground">
               <p className="text-lg mb-2">No measurements yet</p>
-              <p className="text-sm">Click `#&34;`Add Measurement`#&34;` to get started</p>
+              <p className="text-sm">Click &#34;Add Measurement&#34; to get started</p>
             </div>
           )}
         </CardContent>
