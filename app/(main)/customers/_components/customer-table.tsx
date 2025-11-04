@@ -108,7 +108,7 @@ export const CustomerTable = () => {
     return (
       <div className="flex flex-col items-center justify-center py-12 space-y-4">
         <div className="text-center">
-          <h3 className="text-lg font-semibold text-gray-900">No customers found</h3>
+          <h3 className="text-lg font-semibold">No customers found</h3>
           <p className="text-gray-500 mt-1">
             {searchQuery
               ? "Try searching with a different name or phone number"

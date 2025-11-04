@@ -2,22 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -37,28 +27,33 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Loader2, ArrowLeft, Phone, Edit2, Trash2, Save, X, Plus } from "lucide-react";
+import { Loader2, ArrowLeft, Phone, Edit2, Trash2, Save, X } from "lucide-react";
 import { toast } from "sonner";
 import apiClient from "@/lib/axios";
-import { Customer, Measurements } from "@/types";
-import { defaultMeasurements } from "@/lib/constants/measurements";
 import { AddMeasurementDialog } from "./add-measurement";
+import { EditMeasurementDialog } from "./edit-measurement";
+
+// Types
+type Measurements = {
+  id: string;
+  type: string;
+  notes: string;
+  data: Record<string, string>;
+};
+
+type Customer = {
+  id: string;
+  fullName: string;
+  phone: string;
+  createdAt: string;
+  updatedAt: string;
+  measurements: Measurements[];
+};
 
 // Validation Schemas
 const customerSchema = z.object({
   fullName: z.string().min(2, "Name must be at least 2 characters"),
   phone: z.string().min(10, "Phone must be at least 10 digits"),
-});
-
-const measurementSchema = z.object({
-  type: z.string().min(1, "Type is required"),
-  notes: z.string().optional(),
-  data: z.array(
-    z.object({
-      key: z.string().min(1, "Key is required"),
-      value: z.string().min(1, "Value is required"),
-    })
-  ),
 });
 
 export const CustomerDetails = () => {
@@ -69,7 +64,6 @@ export const CustomerDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isEditingCustomer, setIsEditingCustomer] = useState(false);
-  const [editMeasurementId, setEditMeasurementId] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
 
   // Customer Form
@@ -81,35 +75,6 @@ export const CustomerDetails = () => {
     },
   });
 
-  // Measurement Form
-  const measurementForm = useForm<z.infer<typeof measurementSchema>>({
-    resolver: zodResolver(measurementSchema),
-    defaultValues: {
-      type: "",
-      notes: "",
-      data: [{ key: "", value: "" }],
-    },
-  });
-
-  const { fields, append, remove, replace } = useFieldArray({
-    control: measurementForm.control,
-    name: "data",
-  });
-
-  // ✅ Auto-fill measurement fields when type changes
-  useEffect(() => {
-    const type = measurementForm.watch("type").toLowerCase();
-    if (type === "shirt" || type === "pant") {
-      const defaults = defaultMeasurements[type];
-      const formatted = Object.entries(defaults).map(([key, value]) => ({
-        key,
-        value,
-      }));
-      replace(formatted);
-    }
-  }, [measurementForm.watch("type")]);
-
-  // Fetch Customer
   const fetchCustomer = async () => {
     setLoading(true);
     try {
@@ -133,7 +98,7 @@ export const CustomerDetails = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  // Update Customer
+  // Customer Update
   const onUpdateCustomer = async (values: z.infer<typeof customerSchema>) => {
     setActionLoading(true);
     try {
@@ -149,7 +114,7 @@ export const CustomerDetails = () => {
     }
   };
 
-  // Delete Customer
+  // Customer Delete
   const onDeleteCustomer = async () => {
     setActionLoading(true);
     try {
@@ -163,37 +128,7 @@ export const CustomerDetails = () => {
     }
   };
 
-  // Update Measurement
-  const onUpdateMeasurement = async (values: z.infer<typeof measurementSchema>) => {
-    if (!editMeasurementId) return;
-    setActionLoading(true);
-    try {
-      const dataObj = values.data.reduce(
-        (acc, item) => {
-          acc[item.key] = item.value;
-          return acc;
-        },
-        {} as Record<string, string>
-      );
-
-      await apiClient.put(`/customers/measurements/${editMeasurementId}`, {
-        type: values.type,
-        notes: values.notes || "",
-        data: dataObj,
-      });
-      toast.success("Measurement updated successfully");
-      setEditMeasurementId(null);
-      measurementForm.reset();
-      fetchCustomer();
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to update measurement");
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
-  // Delete Measurement
+  // Measurement Delete
   const onDeleteMeasurement = async (measurementId: string) => {
     setActionLoading(true);
     try {
@@ -206,20 +141,6 @@ export const CustomerDetails = () => {
     } finally {
       setActionLoading(false);
     }
-  };
-
-  // Open Edit Measurement
-  const openEditMeasurement = (measurement: Measurements) => {
-    setEditMeasurementId(measurement.id);
-    const dataArray = Object.entries(measurement.data).map(([key, value]) => ({
-      key,
-      value,
-    }));
-    measurementForm.reset({
-      type: measurement.type,
-      notes: measurement.notes,
-      data: dataArray,
-    });
   };
 
   if (loading)
@@ -367,7 +288,7 @@ export const CustomerDetails = () => {
             <div className="flex items-center gap-3 text-lg">
               <Phone className="h-5 w-5 text-primary" />
               <a
-                href={`tel:+91${customer.phone}`}
+                href={`tel:${customer.phone}`}
                 className="text-foreground hover:text-primary transition-colors font-medium"
               >
                 {customer.phone}
@@ -381,7 +302,12 @@ export const CustomerDetails = () => {
       <Card className="border-primary/20 shadow-lg">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-2xl font-semibold">Measurements</CardTitle>
-          <AddMeasurementDialog customer={customer} onSave={() => fetchCustomer()} />
+
+          <AddMeasurementDialog
+            customerId={id as string}
+            customerName={customer.fullName}
+            onSuccess={fetchCustomer}
+          />
         </CardHeader>
         <CardContent>
           {customer.measurements?.length ? (
@@ -394,125 +320,16 @@ export const CustomerDetails = () => {
                       {m.notes && <p className="text-sm text-muted-foreground mt-1">{m.notes}</p>}
                     </div>
                     <div className="flex gap-2">
-                      <Dialog
-                        open={editMeasurementId === m.id}
-                        onOpenChange={(open) => {
-                          if (!open) {
-                            setEditMeasurementId(null);
-                            measurementForm.reset();
-                          }
-                        }}
-                      >
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => openEditMeasurement(m)}
-                            className="hover:bg-primary/10"
-                          >
+                      <EditMeasurementDialog
+                        measurement={m}
+                        customerName={customer.fullName}
+                        onSuccess={fetchCustomer}
+                        trigger={
+                          <Button variant="ghost" size="icon" className="hover:bg-primary/10">
                             <Edit2 className="h-4 w-4" />
                           </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-                          <DialogHeader>
-                            <DialogTitle>Edit Measurement</DialogTitle>
-                            <DialogDescription>
-                              Update measurement details for {customer.fullName}
-                            </DialogDescription>
-                          </DialogHeader>
-                          <Form {...measurementForm}>
-                            <form
-                              onSubmit={measurementForm.handleSubmit(onUpdateMeasurement)}
-                              className="space-y-4"
-                            >
-                              <FormField
-                                control={measurementForm.control}
-                                name="type"
-                                render={({ field }) => (
-                                  <FormItem>
-                                    <FormLabel>Type</FormLabel>
-                                    <FormControl>
-                                      <Input placeholder="e.g., Shirt, Pant, Suit" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                  </FormItem>
-                                )}
-                              />
-                              <FormField
-                                control={measurementForm.control}
-                                name="notes"
-                                render={({ field }) => (
-                                  <FormItem>
-                                    <FormLabel>Notes (Optional)</FormLabel>
-                                    <FormControl>
-                                      <Textarea placeholder="Additional notes..." {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                  </FormItem>
-                                )}
-                              />
-                              <div className="space-y-2">
-                                <FormLabel>Measurements Data</FormLabel>
-                                {fields.map((field, index) => (
-                                  <div key={field.id} className="flex gap-2">
-                                    <FormField
-                                      control={measurementForm.control}
-                                      name={`data.${index}.key`}
-                                      render={({ field }) => (
-                                        <FormItem className="flex-1">
-                                          <FormControl>
-                                            <Input placeholder="Label" {...field} />
-                                          </FormControl>
-                                          <FormMessage />
-                                        </FormItem>
-                                      )}
-                                    />
-                                    <FormField
-                                      control={measurementForm.control}
-                                      name={`data.${index}.value`}
-                                      render={({ field }) => (
-                                        <FormItem className="flex-1">
-                                          <FormControl>
-                                            <Input placeholder="Value" {...field} />
-                                          </FormControl>
-                                          <FormMessage />
-                                        </FormItem>
-                                      )}
-                                    />
-                                    <Button
-                                      type="button"
-                                      variant="outline"
-                                      size="icon"
-                                      onClick={() => remove(index)}
-                                      disabled={fields.length === 1}
-                                    >
-                                      <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                  </div>
-                                ))}
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => append({ key: "", value: "" })}
-                                  className="w-full"
-                                >
-                                  <Plus className="h-4 w-4 mr-2" />
-                                  Add Field
-                                </Button>
-                              </div>
-                              <DialogFooter>
-                                <Button type="submit" disabled={actionLoading}>
-                                  {actionLoading && (
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                  )}
-                                  Update Measurement
-                                </Button>
-                              </DialogFooter>
-                            </form>
-                          </Form>
-                        </DialogContent>
-                      </Dialog>
+                        }
+                      />
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <Button
