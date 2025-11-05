@@ -27,13 +27,14 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Loader2, ArrowLeft, Phone, Edit2, Trash2, Save, X } from "lucide-react";
+import { Loader2, ArrowLeft, Phone, Edit2, Trash2, Save, X, Printer } from "lucide-react";
 import { toast } from "sonner";
 import apiClient from "@/lib/axios";
 import { AddMeasurementDialog } from "./add-measurement";
 import { EditMeasurementDialog } from "./edit-measurement";
 import { Customer } from "@/types";
 import { formatDate } from "@/lib/format-date";
+import { printMeasurement } from "@/lib/print-measurement";
 
 // Validation Schemas
 const customerSchema = z.object({
@@ -44,6 +45,8 @@ const customerSchema = z.object({
 export const CustomerDetails = () => {
   const { id } = useParams();
   const router = useRouter();
+
+  // const handlePrint = () => window.print();
 
   const [customer, setCustomer] = useState<Customer>();
   const [loading, setLoading] = useState(true);
@@ -348,6 +351,10 @@ export const CustomerDetails = () => {
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
+
+                      <Button className="" onClick={() => printMeasurement(customer, m)}>
+                        <Printer />
+                      </Button>
                     </div>
                   </CardHeader>
                   <CardContent>

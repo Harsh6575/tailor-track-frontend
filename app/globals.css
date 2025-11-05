@@ -128,3 +128,15 @@ body,
     @apply bg-background text-foreground;
   }
 }
+
+@media print {
+  body {
+    background: white !important;
+  }
+  /* .print:hidden {
+    display: none !important;
+  }
+  .print:p-0 {
+    padding: 0 !important;
+  } */
+}
