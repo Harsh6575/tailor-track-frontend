@@ -1,5 +1,6 @@
 import type { Customer, Measurements } from "@/types";
 import { formatDate } from "./format-date";
+import { t, translations } from "./constants/translation";
 
 export const printMeasurement = (customer: Customer, measurement: Measurements) => {
   const printContent = `
@@ -76,6 +77,11 @@ export const printMeasurement = (customer: Customer, measurement: Measurements) 
             margin-top: 12px;
           }
 
+          .capitalize {
+            text-transform: capitalize;
+          }
+
+
           /* Prevent extra blank page */
           @media print {
             body {
@@ -91,20 +97,25 @@ export const printMeasurement = (customer: Customer, measurement: Measurements) 
         <div class="container">
           <div class="header">
             <h1>${customer.fullName}</h1>
-            <p>${measurement.type} Measurement Sheet</p>
+            <p class="capitalize">${measurement.type} Measurement Sheet</p>
           </div>
 
           <div class="data">
             <table>
               ${Object.entries(measurement.data)
-                .map(([key, value]) => `<tr><td>${key}</td><td>${value}</td></tr>`)
+                .map(
+                  ([key, value]) => `<tr><td>${t(key as keyof (typeof translations)["en"], "en")}
+                                ${" (" + t(key as keyof (typeof translations)["en"], "gu") + ")"}</td><td>${value}</td></tr>`
+                )
                 .join("")}
             </table>
           </div>
 
           ${
             measurement.notes
-              ? `<div class="notes"><strong>Notes:</strong> ${measurement.notes}</div>`
+              ? `<div class="notes"><strong>${t("notes", "en")}
+                ${" (" + t("notes", "gu") + ")"}
+              </strong> : ${measurement.notes}</div>`
               : ""
           }
 

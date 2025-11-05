@@ -19,6 +19,8 @@ import { useState } from "react";
 import apiClient from "@/lib/axios";
 import { toast } from "sonner";
 
+import { t, translations } from "@/lib/constants/translation";
+
 export const MeasurementOverview = ({
   customer,
   measurement,
@@ -105,7 +107,10 @@ export const MeasurementOverview = ({
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           {Object.entries(measurement.data).map(([key, value]) => (
             <div key={key} className="bg-muted/50 rounded-lg p-3 hover:bg-muted transition-colors">
-              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">{key}</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
+                {t(key as keyof (typeof translations)["en"], "en")}
+                {" (" + t(key as keyof (typeof translations)["en"], "gu") + ")"}
+              </p>
               <p className="text-sm font-semibold">{value}</p>
             </div>
           ))}
