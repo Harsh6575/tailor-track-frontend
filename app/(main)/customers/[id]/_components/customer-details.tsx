@@ -33,6 +33,7 @@ import apiClient from "@/lib/axios";
 import { AddMeasurementDialog } from "./add-measurement";
 import { EditMeasurementDialog } from "./edit-measurement";
 import { Customer } from "@/types";
+import { formatDate } from "@/lib/format-date";
 
 // Validation Schemas
 const customerSchema = z.object({
@@ -162,7 +163,7 @@ export const CustomerDetails = () => {
               {customer.fullName}
             </CardTitle>
             <p className="text-xs sm:text-sm text-muted-foreground">
-              Joined {new Date(customer.createdAt).toLocaleDateString("en-IN")}
+              Joined {formatDate(customer.createdAt)}
             </p>
           </div>
           <div className="flex gap-2">
@@ -369,11 +370,7 @@ export const CustomerDetails = () => {
                         Last Updated:
                       </span>
                       <span className="text-sm font-semibold text-foreground">
-                        {new Date(m.updatedAt).toLocaleDateString("en-IN", {
-                          day: "2-digit",
-                          month: "short",
-                          year: "numeric",
-                        })}
+                        {formatDate(m.updatedAt)}
                       </span>
                     </div>
                   </CardContent>
