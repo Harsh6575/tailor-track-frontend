@@ -1,6 +1,7 @@
 import type { Customer, Measurements } from "@/types";
 import { formatDate } from "./format-date";
 import { t, translations } from "./constants/translation";
+import { APP_NAME } from "./constants";
 
 export const printMeasurement = (customer: Customer, measurement: Measurements) => {
   const printContent = `
@@ -120,7 +121,7 @@ export const printMeasurement = (customer: Customer, measurement: Measurements) 
           }
 
           <div class="footer">
-            Tailor Track — Generated on ${formatDate(new Date())}
+            ${APP_NAME} — Generated on ${formatDate(new Date())}
           </div>
         </div>
       </body>
