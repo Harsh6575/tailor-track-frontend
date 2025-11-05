@@ -163,7 +163,7 @@ export const CustomerDetails = () => {
     return <div className="text-center text-muted-foreground py-12">Customer not found.</div>;
 
   return (
-    <main className="p-6 max-w-5xl mx-auto space-y-6">
+    <main className="max-w-5xl mx-auto space-y-6 h-full w-full">
       {/* Back button */}
       <Button variant="ghost" size="sm" onClick={() => router.back()} className="gap-2">
         <ArrowLeft className="h-4 w-4" />
@@ -174,9 +174,11 @@ export const CustomerDetails = () => {
       <Card className="border-primary/20 shadow-lg">
         <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-4">
           <div className="space-y-1">
-            <CardTitle className="text-3xl font-bold tracking-tight">{customer.fullName}</CardTitle>
-            <p className="text-sm text-muted-foreground">
-              Joined {new Date(customer.createdAt).toLocaleDateString()}
+            <CardTitle className="text-xl sm:text-3xl font-bold tracking-tight">
+              {customer.fullName}
+            </CardTitle>
+            <p className="text-xs sm:text-sm text-muted-foreground">
+              Joined {new Date(customer.createdAt).toLocaleDateString("en-IN")}
             </p>
           </div>
           <div className="flex gap-2">
@@ -285,8 +287,8 @@ export const CustomerDetails = () => {
               </form>
             </Form>
           ) : (
-            <div className="flex items-center gap-3 text-lg">
-              <Phone className="h-5 w-5 text-primary" />
+            <div className="flex items-center gap-3 text-sm sm:text-lg">
+              <Phone className="h-3 sm:h-5 w-3 sm:w-5 text-primary" />
               <a
                 href={`tel:${customer.phone}`}
                 className="text-foreground hover:text-primary transition-colors font-medium"
@@ -301,7 +303,7 @@ export const CustomerDetails = () => {
       {/* Measurements Section */}
       <Card className="border-primary/20 shadow-lg">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
-          <CardTitle className="text-2xl font-semibold">Measurements</CardTitle>
+          <CardTitle className="text-lg sm:text-2xl font-semibold">Measurements</CardTitle>
 
           <AddMeasurementDialog
             customerId={id as string}
@@ -383,8 +385,8 @@ export const CustomerDetails = () => {
             </div>
           ) : (
             <div className="text-center py-12 text-muted-foreground">
-              <p className="text-lg mb-2">No measurements yet</p>
-              <p className="text-sm">Click &#34;Add Measurement&#34; to get started</p>
+              <p className="text-sm sm:text-lg mb-2">No measurements yet</p>
+              <p className="text-xs sm:text-sm">Click &#34;Add Measurement&#34; to get started</p>
             </div>
           )}
         </CardContent>

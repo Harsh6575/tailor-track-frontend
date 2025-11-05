@@ -1,21 +1,9 @@
-import { Footer } from "@/components/footer";
-import { Navbar } from "@/components/navbar";
+import { MainLayout } from "@/components/layouts/main-layout";
 
-export default function MainLayout({
+export default function MainLayout2({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <div className="min-h-screen flex flex-col">
-      {/* Navbar always on top */}
-      <Navbar />
-
-      {/* Main content grows to fill space */}
-      <main className="flex-1 p-2 md:px-6 md:py-8">{children}</main>
-
-      {/* Footer at the bottom */}
-      <Footer />
-    </div>
-  );
+  return <MainLayout>{children}</MainLayout>;
 }

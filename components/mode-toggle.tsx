@@ -23,10 +23,11 @@ export const ModeToggle = () => {
       variant="ghost"
       size="icon"
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      className="absolute"
+      className="rounded-full hover:bg-accent transition-colors"
+      aria-label="Toggle theme"
     >
       <span className="sr-only">Toggle theme</span>
-      {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+      {isDark ? <Sun className="h-4 w-4 text-yellow-500" /> : <Moon className="h-4 w-4" />}
     </Button>
   );
 };

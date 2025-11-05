@@ -145,7 +145,7 @@ export const CustomerTable = () => {
   return (
     <div className="space-y-4">
       {/* 🔍 Top Bar: Search + Add */}
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div className="relative w-full sm:w-64">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
           <Input

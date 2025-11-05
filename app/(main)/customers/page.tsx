@@ -7,12 +7,12 @@ export const metadata = {
 
 export default function CustomersPage() {
   return (
-    <main className="p-6 max-w-5xl mx-auto">
+    <div className="max-w-5xl mx-auto h-full w-full">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Customers</h1>
       </div>
 
       <CustomerTable />
-    </main>
+    </div>
   );
 }

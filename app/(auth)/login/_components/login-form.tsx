@@ -50,7 +50,7 @@ export const LoginForm = () => {
     try {
       setLoading(true);
       const res = await apiClient.post("/users/login", values);
-      toast.success("✅ Logged in successfully!");
+      toast.success("Logged in successfully!");
       const { accessToken, refreshToken, user } = res.data;
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
