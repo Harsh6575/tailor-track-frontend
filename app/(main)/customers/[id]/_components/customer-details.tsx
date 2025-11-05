@@ -32,23 +32,7 @@ import { toast } from "sonner";
 import apiClient from "@/lib/axios";
 import { AddMeasurementDialog } from "./add-measurement";
 import { EditMeasurementDialog } from "./edit-measurement";
-
-// Types
-type Measurements = {
-  id: string;
-  type: string;
-  notes: string;
-  data: Record<string, string>;
-};
-
-type Customer = {
-  id: string;
-  fullName: string;
-  phone: string;
-  createdAt: string;
-  updatedAt: string;
-  measurements: Measurements[];
-};
+import { Customer } from "@/types";
 
 // Validation Schemas
 const customerSchema = z.object({
@@ -378,6 +362,19 @@ export const CustomerDetails = () => {
                           <p className="text-sm font-semibold">{value}</p>
                         </div>
                       ))}
+                    </div>
+
+                    <div className="flex items-center justify-between bg-muted/30 border border-border rounded-lg px-4 py-2 mt-3">
+                      <span className="text-sm font-medium text-muted-foreground">
+                        Last Updated:
+                      </span>
+                      <span className="text-sm font-semibold text-foreground">
+                        {new Date(m.updatedAt).toLocaleDateString("en-IN", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </span>
                     </div>
                   </CardContent>
                 </Card>

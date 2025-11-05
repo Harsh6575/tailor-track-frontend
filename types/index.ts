@@ -16,4 +16,6 @@ export type Measurements = {
   type: string;
   notes: string;
   data: Record<string, string>;
+  createdAt: string;
+  updatedAt: string;
 };
