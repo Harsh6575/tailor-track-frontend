@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { ModeToggle } from "./mode-toggle";
+import { Logo } from "./logo";
 
 export const Navbar = () => {
   const router = useRouter();
@@ -36,12 +37,7 @@ export const Navbar = () => {
 
   return (
     <header className="border-b shadow-sm flex items-center justify-between w-full px-6 py-3">
-      <div
-        className="text-2xl font-bold cursor-pointer select-none"
-        onClick={() => router.push("/")}
-      >
-        Tailor<span className="text-blue-600">Track</span>
-      </div>
+      <Logo />
       <div className="flex items-center gap-4">
         {isLoggedIn ? (
           <Button variant="outline" onClick={handleLogout}>
